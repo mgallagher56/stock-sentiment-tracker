@@ -1,5 +1,5 @@
 const MongoClient = require('mongodb').MongoClient;
-const url = 'mongodb://localhost:27017';
+const url = 'mongodb+srv://mgallagher56:uEdopTpzrZoUz210@trading-sentiment.c3vcx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
 const dbname = 'stocks';
 const Client = new MongoClient(url, {useNewUrlParser: true, useUnifiedTopology: true});
 
