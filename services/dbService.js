@@ -1,5 +1,6 @@
+require('dotenv').config();
 const MongoClient = require('mongodb').MongoClient;
-const url = 'mongodb+srv://mgallagher56:uEdopTpzrZoUz210@trading-sentiment.c3vcx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+const url = process.env.MONGO_URL;
 const dbname = 'stocks';
 const Client = new MongoClient(url, {useNewUrlParser: true, useUnifiedTopology: true});
 
