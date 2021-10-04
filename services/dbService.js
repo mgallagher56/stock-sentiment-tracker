@@ -1,4 +1,3 @@
-require('dotenv').config();
 const MongoClient = require('mongodb').MongoClient;
 const url = process.env.MONGO_URL;
 const dbname = 'stocks';
