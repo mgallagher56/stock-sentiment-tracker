@@ -1,0 +1,44 @@
+{
+    "status": 200,
+    "statusText": "OK",
+    "headers": {
+        "server": "watson-gateway",
+        "content-length": "325",
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-cache, no-store",
+        "x-dp-watson-tran-id": "68c6a4f2-176b-434e-aa27-eeaf30101c6c, 68c6a4f2-176b-434e-aa27-eeaf30101c6c",
+        "content-security-policy": "default-src 'none'",
+        "pragma": "no-cache",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "x-xss-protection": "1; mode=block",
+        "strict-transport-security": "max-age=31536000; includeSubDomains;",
+        "x-request-id": "68c6a4f2-176b-434e-aa27-eeaf30101c6c",
+        "x-global-transaction-id": "68c6a4f2-176b-434e-aa27-eeaf30101c6c",
+        "x-edgeconnect-midmile-rtt": "74",
+        "x-edgeconnect-origin-mex-latency": "314",
+        "date": "Sat, 09 Oct 2021 06:56:44 GMT",
+        "connection": "close"
+    },
+    "result": {
+        "usage": {
+            "text_units": 1,
+            "text_characters": 66,
+            "features": 1
+        },
+        "sentiment": {
+            "targets": [
+                {
+                    "text": "apple",
+                    "score": -0.974929,
+                    "label": "negative"
+                }
+            ],
+            "document": {
+                "score": -0.974929,
+                "label": "negative"
+            }
+        },
+        "language": "en"
+    }
+}

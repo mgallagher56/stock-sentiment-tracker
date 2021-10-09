@@ -1,0 +1,66 @@
+{
+    "data": {
+        "author_id": "295190953",
+        "id": "1446743394101776386",
+        "public_metrics": {
+            "retweet_count": 335,
+            "reply_count": 0,
+            "like_count": 0,
+            "quote_count": 0
+        },
+        "referenced_tweets": [
+            {
+                "type": "retweeted",
+                "id": "1446640119574773760"
+            }
+        ],
+        "text": "RT @bpapplemusic: 🇦🇺 Australia Apple Music: K-Pop \n\n#1 MONEY (+1) *new-peak*\n\n@BLACKPINK #LISA\nhttps://t.co/erKMd1qd9W"
+    },
+    "includes": {
+        "users": [
+            {
+                "id": "295190953",
+                "name": "·͜·♡น้องซอมพอ🦋",
+                "public_metrics": {
+                    "followers_count": 730,
+                    "following_count": 751,
+                    "tweet_count": 376041,
+                    "listed_count": 1
+                },
+                "username": "nenosister"
+            },
+            {
+                "id": "1252747424914829312",
+                "name": "BLACKPINK on Apple Music",
+                "public_metrics": {
+                    "followers_count": 5431,
+                    "following_count": 13,
+                    "tweet_count": 2780,
+                    "listed_count": 50
+                },
+                "username": "bpapplemusic"
+            },
+            {
+                "id": "1273850774380883975",
+                "name": "BLACKPINKOFFICIAL",
+                "public_metrics": {
+                    "followers_count": 4951002,
+                    "following_count": 0,
+                    "tweet_count": 424,
+                    "listed_count": 6670
+                },
+                "username": "BLACKPINK"
+            }
+        ]
+    },
+    "matching_rules": [
+        {
+            "id": "1445143280291811331",
+            "tag": ""
+        },
+        {
+            "id": "1445304878516088834",
+            "tag": ""
+        }
+    ]
+}
