@@ -1,8 +1,7 @@
-const MongoClient = require('mongodb').MongoClient;
-const calculateTweetScore = require('../functions/helpers/calculateTweetScore');
-const url = process.env.MONGO_URL;
-const dbname = 'stocks';
-const Client = new MongoClient(url, {useNewUrlParser: true, useUnifiedTopology: true});
+const MongoClient         = require('mongodb').MongoClient;
+const calculations = require('../functions/helpers/calculations');
+const url                 = process.env.MONGO_URL;
+const Client              = new MongoClient(url, {useNewUrlParser: true, useUnifiedTopology: true});
 
 /**
  * Creates db connection. Throws error if connection fails.
@@ -12,49 +11,30 @@ const Client = new MongoClient(url, {useNewUrlParser: true, useUnifiedTopology: 
  * @return db connection
  *
  */
-function connectToDB(cb) {
+function connectToDB(dbName, cb) {
     Client.connect(function (err) {
         if (err)
             throw err;
-        let db = Client.db(dbname);
+        let db = Client.db(dbName);
         cb(db);
     })
 }
 
 /**
- * Adds a stock price and time to the db collection 'stocks'
+ * Adds an object to the company db collection
  *
  * @param db database connection
  *
- * @param newUser object container new user data
+ * @param companyName name of company db collection
+ *
+ * @param data dat object to insert to db
  *
  * @param callback function
  *
  */
 
- const addStockPrice = (db, companyName, stockPrice, callback) => {
-    let currentStockPrice = {
-        time  : Date.now() * 1000,
-        price : stockPrice
-    };
-
-    db.collection(companyName + 'StockPrice').insertOne(currentStockPrice, (err, result) => {
-        if (err) {
-            throw err;
-        }
-        callback(result);
-    });
-};
-
-const addTweetToDb = ( db, companyName, tweet, watsonAnalysis, callback ) => {
-    const score = calculateTweetScore.calculateTweetScore(tweet, watsonAnalysis);
-    let tweetData = {
-        time        : Date.now() * 1000,
-        tweetContent: tweet.data.text,
-        tweetData   : tweet
-    };
-
-    db.collection(companyName + 'Tweets').insertOne(tweetData, (err, result) => {
+const addToDb = ( db, companyName, data, callback ) => {
+    db.collection(companyName).insertOne(data, (err, result) => {
         if (err) {
             throw err;
         }
@@ -63,5 +43,4 @@ const addTweetToDb = ( db, companyName, tweet, watsonAnalysis, callback ) => {
 }
 
 module.exports.connectToDB = connectToDB;
-module.exports.addStockPrice = addStockPrice;
-module.exports.addTweetToDb  = addTweetToDb;
+module.exports.addToDb  = addToDb;

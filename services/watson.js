@@ -1,5 +1,5 @@
 const NaturalLanguageUnderstandingV1 = require('ibm-watson/natural-language-understanding/v1');
-const { IamAuthenticator } = require('ibm-watson/auth');
+const { IamAuthenticator }           = require('ibm-watson/auth');
 
 const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
     version: '2021-08-01',
@@ -26,7 +26,7 @@ const analyseSentiment = async (text, companyName, stockName) => {
 
     await naturalLanguageUnderstanding.analyze(analyzeParams)
         .then(analysisResults => {
-            return JSON.stringify(analysisResults, null, 2);
+            return analysisResults;
         })
         .catch(err => {
             console.log('error:', err);
