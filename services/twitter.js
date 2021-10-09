@@ -1,9 +1,9 @@
 const { TwitterApi, ETwitterStreamEvent } = require('twitter-api-v2');
-const addStockPriceToDb = require('./addToDb');
+const dbService = require('./dbService');
+const watson = require('./watson');
 
-const twitterStream = async ( db ) => {
-    const client = new TwitterApi(process.env.TWITTER_TOKEN); // (create a client)
-
+const twitterStream = async (db) => {
+    const client = new TwitterApi(process.env.TWITTER_TOKEN);  // (create a client)
     const rules = await client.v2.streamRules();
 
     // Add our rules
@@ -20,11 +20,13 @@ const twitterStream = async ( db ) => {
     // Enable auto reconnect
     stream.autoReconnect = true;
 
+    // When tweet is sent analyse sentiment and add to db
     stream.on(ETwitterStreamEvent.Data, async tweet => {
-        if ( 'referenced_tweets' in tweet.data ) {
-            const isARt = tweet.data.referenced_tweets[0].type;
-            if ( 'retweeted' !== isARt && 'replied_to' !== isARt ) {
-                addStockPriceToDb.addTweetToDb(db, 'apple', tweet, (result) => {})
+        if (!('referenced_tweets' in tweet.data)) {
+            const lowerCaseTweet = tweet.data.text.toLowerCase()
+            if (lowerCaseTweet.includes('apple') || lowerCaseTweet.includes('aapl')) {
+                watsonAnalysis = await watson.analyseSentiment(tweet.data.text, 'apple', 'AAPL');
+                dbService.addTweetToDb(db, 'apple', tweet, watsonAnalysis, (result) => { })
             }
         }
     })
