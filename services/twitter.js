@@ -7,7 +7,7 @@ const twitterStream = async (db, companyName, stockName, addToDbIntervalMins) =>
     const rules            = await client.v2.streamRules();
     const companyNameLower = companyName.toLowerCase();
     const stockNameLower   = stockName.toLowerCase();
-    const interval         = 1000 * 10 * addToDbIntervalMins
+    const interval         = 1000 * 60 * addToDbIntervalMins
     let   tweetsArray      = [];
 
     // Add our rules

@@ -63,7 +63,7 @@ const analyseSentiment = async (db, tweetArray, companyNameLower, stockNameLower
             const watsonScoreAvg = calculations.getAverageFromArray(watsonScoreArray);
             const dateTime = calculations.getNearestTime(interval);
             let tweetData = {
-                dateTime: dateTime,
+                dateTime: Date.now(),
                 tweetScore: watsonScoreAvg
             };
 
