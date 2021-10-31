@@ -8,7 +8,7 @@ const express           = require('express');
 const app               = express();
 const port              = process.env.PORT || 5000;
 const DbService         = require('../Services/DbService');
-const addToDbInterval   = .5;
+const addToDbInterval   = 1;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
