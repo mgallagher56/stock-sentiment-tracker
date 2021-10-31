@@ -17,55 +17,61 @@ const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
 const analyseSentiment = async (db, tweetArray, companyNameLower, stockNameLower, interval) => {
     let watsonScoreArray = [];
 
+    if (tweetArray.length) {
+        const tweetNumber = tweetArray.length;
+        const timer = setIntervalAsync(async () => {
+            for (let i = 0; i < tweetNumber; i++) {
+                const tweet = tweetArray[ i ];
 
-    const timer = setIntervalAsync(async () => {
-        const tweet = tweetArray[ 0 ];
-        if ('undefined' !== tweet && tweet) {
-            const lowerCaseTweet = tweet.data.text.toLowerCase();
-            const analyzeParams = {
-                'text': lowerCaseTweet,
-                'features': {
-                    'sentiment': {
-                        'targets': [
-                            companyNameLower,
-                            '@' + companyNameLower,
-                            '#' + companyNameLower,
-                            stockNameLower
-                        ]
+                if ('undefined' !== tweet && tweet) {
+                    const lowerCaseTweet = tweet.data.text.toLowerCase();
+                    const analyzeParams = {
+                        'text': lowerCaseTweet,
+                        'features': {
+                            'sentiment': {
+                                'targets': [
+                                    companyNameLower,
+                                    '@' + companyNameLower,
+                                    '#' + companyNameLower,
+                                    stockNameLower
+                                ]
+                            }
+                        }
+                    };
+
+                    // make sure tweet contains company name or stock name
+                    if (lowerCaseTweet.includes(companyNameLower) || lowerCaseTweet.includes(stockNameLower)) {
+                        await naturalLanguageUnderstanding.analyze(analyzeParams)
+                            .then(analysisResults => {
+                                const tweetScore = calculations.calculateTweetScore(tweet, analysisResults);
+                                if (0 !== tweetScore && analysisResults.status === 200 && !watsonScoreArray.includes(tweetScore)) {
+                                    watsonScoreArray.push(tweetScore);
+                                }
+                            })
+                            .catch(err => {
+                                console.log('error:', err);
+                            });
                     }
                 }
+            }
+        }, 250)
+
+        // get average score and time and add to db
+        await delay(interval);
+        await clearIntervalAsync(timer)
+        if (watsonScoreArray.length) {
+            const watsonScoreAvg = calculations.getAverageFromArray(watsonScoreArray);
+            const dateTime = calculations.getNearestTime(interval);
+            let tweetData = {
+                dateTime: dateTime,
+                tweetScore: watsonScoreAvg
             };
 
-            // make sure tweet contains company name or stock name
-            if (lowerCaseTweet.includes(companyNameLower) || lowerCaseTweet.includes(stockNameLower)) {
-                await naturalLanguageUnderstanding.analyze(analyzeParams)
-                    .then(analysisResults => {
-                            const tweetScore = calculations.calculateTweetScore(tweet, analysisResults);
-                            if (0 !== tweetScore) {
-                                watsonScoreArray.push(tweetScore);
-                            }
-                    })
-                    .catch(err => {
-                        console.log('error:', err);
-                    });
-            }
-            tweetArray.shift();
+            dbService.addToDb(db, companyNameLower, tweetData, (result) => { })
+            watsonScoreArray = [];
         }
-    }, 250)
 
-
-    // get average score and time and add to db
-    await delay(interval);
-    await clearIntervalAsync(timer)
-    const watsonScoreAvg = calculations.getAverageFromArray(watsonScoreArray);
-    const dateTime = calculations.getNearestTime(interval);
-    let tweetData = {
-        dateTime: dateTime,
-        tweetScore: watsonScoreAvg
-    };
-
-    dbService.addToDb(db, companyNameLower, tweetData, (result) => {})
-    watsonScoreArray = [];
+    }
 }
 
 module.exports.naturalLanguageUnderstanding = naturalLanguageUnderstanding;

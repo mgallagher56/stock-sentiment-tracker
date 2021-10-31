@@ -5,7 +5,6 @@ const calculateTweetScore = (tweet, watsonData) => {
 }
 
 const getAverageFromArray = (arr) => {
-    console.log(arr);
     let total = 0;
     let count = 0;
 

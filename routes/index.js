@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 stockPriceService.openSocket(socket, 'AAPL');
 
 DbService.connectToDB( 'stocks', ((db) => {
-    // stockPriceService.priceListener(db, socket, 'Apple', addToDbInterval);
+    stockPriceService.priceListener(db, socket, 'Apple', addToDbInterval);
     twitterService.twitterStream(db, 'Apple', 'AAPL', addToDbInterval);
 }));
 

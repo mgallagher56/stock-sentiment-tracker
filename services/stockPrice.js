@@ -19,7 +19,7 @@ let priceListener = (db, socket, companyName, addToDbIntervalMins) => {
 
     // Listen for messages
     socket.addEventListener('message', (message) => {
-        console.log(message.data);
+        // console.log(message.data);
         if ('undefined' !== typeof message.data && message.data) {
             let priceData = JSON.parse(message.data);
 
