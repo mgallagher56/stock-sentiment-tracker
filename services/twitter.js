@@ -1,19 +1,18 @@
 const { TwitterApi, ETwitterStreamEvent } = require('twitter-api-v2');
-const dbService = require('./dbService');
 const watson = require('./watson');
-const calculations = require('../functions/helpers/calculations')
+
 
 const twitterStream = async (db, companyName, stockName, addToDbIntervalMins) => {
-    const client            = new TwitterApi(process.env.TWITTER_TOKEN);  // (create a client)
-    const rules             = await client.v2.streamRules();
-    const companyNameLower  = companyName.toLowerCase();
-    const stockNameLower    = stockName.toLowerCase();
-    const interval          = 1000 * 60 * addToDbIntervalMins
-    let   twitterScoreArray = [];
+    const client           = new TwitterApi(process.env.TWITTER_TOKEN);  // (create a client)
+    const rules            = await client.v2.streamRules();
+    const companyNameLower = companyName.toLowerCase();
+    const stockNameLower   = stockName.toLowerCase();
+    const interval         = 1000 * 60 * addToDbIntervalMins
+    let   tweetsArray      = [];
 
     // Add our rules
     await client.v2.updateStreamRules({
-        add: [ { value: '@' + companyName }, { value: '#' + companyNameLower }, { value: stockName } ],
+        add: [ { value: companyNameLower }, { value: '@' + companyName }, { value: '#' + companyNameLower }, { value: stockName } ],
     }).catch();
 
     const stream = await client.v2.searchStream({
@@ -29,27 +28,13 @@ const twitterStream = async (db, companyName, stockName, addToDbIntervalMins) =>
     stream.on(ETwitterStreamEvent.Data, async tweet => {
         // check if original tweet, not quote or retweet
         if (!('referenced_tweets' in tweet.data)) {
-            // make sure tweet contains company name or stock name
-            const lowerCaseTweet = tweet.data.text.toLowerCase()
-            if (lowerCaseTweet.includes(companyNameLower) || lowerCaseTweet.includes(stockNameLower)) {
-                const watsonAnalysis = await watson.analyseSentiment(lowerCaseTweet, companyNameLower, stockNameLower).catch();
-                if( 200 === watsonAnalysis.status) {
-                    twitterScoreArray.push(calculations.calculateTweetScore(tweet, watsonAnalysis));
-                }
-            }
+            tweetsArray.push(tweet);
         }
     })
 
     setInterval(() => {
-        const twitterScoreAvg = calculations.getAverageFromArray(twitterScoreArray)
-        const dateTime        = calculations.getNearestTime(interval);
-        let   tweetData       = {
-            dateTime  : dateTime,
-            tweetScore: twitterScoreAvg
-        };
-
-        dbService.addToDb(db, companyNameLower, tweetData, (result) => { })
-        twitterScoreArray = [];
+        watson.analyseSentiment(db, tweetsArray, companyNameLower, stockNameLower, interval).catch();
+        tweetsArray = [];
     }, interval);
 
     // const stream = await client.v2.searchStream();

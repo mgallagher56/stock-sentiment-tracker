@@ -14,12 +14,12 @@ let openSocket = (socket, stockName) => {
 
 // use socket to wait for stock prices and add average to db at set interval
 let priceListener = (db, socket, companyName, addToDbIntervalMins) => {
-    const stockPriceArray = [];
+    let stockPriceArray = [];
     const interval = 1000 * 60 * addToDbIntervalMins;
 
     // Listen for messages
     socket.addEventListener('message', (message) => {
-        // console.log(message.data);
+        console.log(message.data);
         if ('undefined' !== typeof message.data && message.data) {
             let priceData = JSON.parse(message.data);
 
@@ -28,7 +28,6 @@ let priceListener = (db, socket, companyName, addToDbIntervalMins) => {
                 priceData.data.forEach(trade => {
                     // add each trade price to array
                     stockPriceArray.push(trade[ 'p' ]);
-
                 });
             }
         }
@@ -43,6 +42,7 @@ let priceListener = (db, socket, companyName, addToDbIntervalMins) => {
             dateTime  : dateTime,
             stockPrice: stockProceAverage
         };
+        console.log(stockProceAverage);
 
         stockPriceArray = [];
         dbService.addToDb(db, companyName.toLowerCase(), priceData, (result) => { })
