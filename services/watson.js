@@ -16,6 +16,7 @@ const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
 
 const analyseSentiment = async (db, tweetArray, companyNameLower, stockNameLower, interval) => {
     let watsonScoreArray = [];
+    let analysedTweets = [];
 
     if (tweetArray.length) {
         const tweetNumber = tweetArray.length;
@@ -41,16 +42,20 @@ const analyseSentiment = async (db, tweetArray, companyNameLower, stockNameLower
 
                     // make sure tweet contains company name or stock name
                     if (lowerCaseTweet.includes(companyNameLower) || lowerCaseTweet.includes(stockNameLower)) {
-                        await naturalLanguageUnderstanding.analyze(analyzeParams)
-                            .then(analysisResults => {
-                                const tweetScore = calculations.calculateTweetScore(tweet, analysisResults);
-                                if (0 !== tweetScore && analysisResults.status === 200 && !watsonScoreArray.includes(tweetScore)) {
-                                    watsonScoreArray.push(tweetScore);
-                                }
-                            })
-                            .catch(err => {
-                                console.log('error:', err);
-                            });
+                        // ensure tweet is not a duplicate
+                        if (!analysedTweets.includes(tweet)) {
+                            await naturalLanguageUnderstanding.analyze(analyzeParams)
+                                .then(analysisResults => {
+                                    const tweetScore = calculations.calculateTweetScore(tweet, analysisResults);
+                                    if (0 !== tweetScore && analysisResults.status === 200 && !watsonScoreArray.includes(tweetScore)) {
+                                        watsonScoreArray.push(tweetScore);
+                                        analysedTweets.push(tweet);
+                                    }
+                                })
+                                .catch(err => {
+                                    console.log('error:', err);
+                                });
+                        }
                     }
                 }
             }
@@ -58,7 +63,7 @@ const analyseSentiment = async (db, tweetArray, companyNameLower, stockNameLower
 
         // get average score and time and add to db
         await delay(interval);
-        await clearIntervalAsync(timer)
+        await clearIntervalAsync(timer);
         if (watsonScoreArray.length) {
             const watsonScoreAvg = calculations.getAverageFromArray(watsonScoreArray);
             const dateTime = calculations.getNearestTime(interval);
@@ -69,6 +74,7 @@ const analyseSentiment = async (db, tweetArray, companyNameLower, stockNameLower
 
             dbService.addToDb(db, companyNameLower, tweetData, (result) => { })
             watsonScoreArray = [];
+            analysedTweets   = [];
         }
 
     }
