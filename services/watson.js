@@ -20,8 +20,9 @@ const analyseSentiment = async (db, tweetArray, companyNameLower, stockNameLower
 
     if (tweetArray.length) {
         const tweetNumber = tweetArray.length;
-        const timer = setIntervalAsync(async () => {
+        const timer = async () => {
             for (let i = 0; i < tweetNumber; i++) {
+                await delay(250);
                 const tweet = tweetArray[ i ];
 
                 if ('undefined' !== tweet && tweet) {
@@ -59,11 +60,11 @@ const analyseSentiment = async (db, tweetArray, companyNameLower, stockNameLower
                     }
                 }
             }
-        }, 250)
+        }
 
         // get average score and time and add to db
         await delay(interval);
-        await clearIntervalAsync(timer);
+        timer();
         if (watsonScoreArray.length) {
             const watsonScoreAvg = calculations.getAverageFromArray(watsonScoreArray);
             const dateTime = calculations.getNearestTime(interval);
