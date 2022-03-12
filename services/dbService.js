@@ -34,6 +34,7 @@ function connectToDB(dbName, cb) {
  */
 
 const addToDb = ( db, companyName, data, callback ) => {
+    console.log('db data',data);
     db.collection(companyName).insertOne(data, (err, result) => {
         if (err) {
             throw err;

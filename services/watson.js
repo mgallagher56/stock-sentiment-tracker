@@ -15,70 +15,57 @@ const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
 });
 
 const analyseSentiment = async (db, tweetArray, companyNameLower, stockNameLower, interval) => {
-    let watsonScoreArray = [];
-    let analysedTweets = [];
-
-    if (tweetArray.length) {
+    const timer = async (tweetArray) => {
         const tweetNumber = tweetArray.length;
-        const timer = async () => {
-            for (let i = 0; i < tweetNumber; i++) {
-                await delay(250);
-                const tweet = tweetArray[ i ];
+        for (let i = 0; i < tweetNumber; i++) {
+            await delay(250);
+            const tweet = tweetArray[ i ];
 
-                if ('undefined' !== tweet && tweet) {
-                    const lowerCaseTweet = tweet.data.text.toLowerCase();
-                    const analyzeParams = {
-                        'text': lowerCaseTweet,
-                        'features': {
-                            'sentiment': {
-                                'targets': [
-                                    companyNameLower,
-                                    '@' + companyNameLower,
-                                    '#' + companyNameLower,
-                                    stockNameLower
-                                ]
-                            }
-                        }
-                    };
-
-                    // make sure tweet contains company name or stock name
-                    if (lowerCaseTweet.includes(companyNameLower) || lowerCaseTweet.includes(stockNameLower)) {
-                        // ensure tweet is not a duplicate
-                        if (!analysedTweets.includes(tweet)) {
-                            await naturalLanguageUnderstanding.analyze(analyzeParams)
-                                .then(analysisResults => {
-                                    const tweetScore = calculations.calculateTweetScore(tweet, analysisResults);
-                                    if (0 !== tweetScore && analysisResults.status === 200 && !watsonScoreArray.includes(tweetScore)) {
-                                        watsonScoreArray.push(tweetScore);
-                                        analysedTweets.push(tweet);
-                                    }
-                                })
-                                .catch(err => {
-                                    console.log('error:', err);
-                                });
+            if ('undefined' !== tweet && tweet) {
+                const lowerCaseTweet = tweet.data.text.toLowerCase();
+                const analyzeParams = {
+                    'text': lowerCaseTweet,
+                    'features': {
+                        'sentiment': {
+                            'targets': [
+                                companyNameLower,
+                                '@' + companyNameLower,
+                                '#' + companyNameLower,
+                                stockNameLower
+                            ]
                         }
                     }
+                };
+
+                // make sure tweet contains company name or stock name
+                if (lowerCaseTweet.includes(companyNameLower) || lowerCaseTweet.includes(stockNameLower)) {
+                    // ensure tweet is not a duplicate
+                    await naturalLanguageUnderstanding.analyze(analyzeParams)
+                        .then(analysisResults => {
+                            const tweetScore = calculations.calculateTweetScore(tweet, analysisResults);
+                            if (0 !== tweetScore  && tweetScore && analysisResults.status === 200) {
+                                let tweetData = {
+                                    dateTime: Date.now(),
+                                    tweet: tweet,
+                                    tweetScore: tweetScore
+                                };
+                                dbService.addToDb(db, companyNameLower, tweetData, (result) => { })
+                            }
+                        })
+                        .catch(err => {
+                            // console.log('error:', err);
+                        });
                 }
             }
         }
-
-        // get average score and time and add to db
-        await delay(interval);
-        timer();
-        if (watsonScoreArray.length) {
-            const watsonScoreAvg = calculations.getAverageFromArray(watsonScoreArray);
-            const dateTime = calculations.getNearestTime(interval);
-            let tweetData = {
-                dateTime: Date.now(),
-                tweetScore: watsonScoreAvg
-            };
-
-            dbService.addToDb(db, companyNameLower, tweetData, (result) => { })
-            watsonScoreArray = [];
-            analysedTweets   = [];
-        }
-
     }
+
+    // get average score and time and add to db
+    await delay(interval);
+    if (tweetArray.length) {
+        timer(tweetArray);
+    }
+
 }
 
 module.exports.naturalLanguageUnderstanding = naturalLanguageUnderstanding;

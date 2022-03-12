@@ -35,16 +35,16 @@ let priceListener = (db, socket, companyName, addToDbIntervalMins) => {
 
     //add average stock price to db at interval
     setInterval(() => {
-        const stockProceAverage = calculations.getAverageFromArray(stockPriceArray)
+        const stockPriceAverage = calculations.getAverageFromArray(stockPriceArray)
         const dateTime          = calculations.getNearestTime(interval);
 
         let priceData = {
             dateTime  : Date.now(),
-            stockPrice: stockProceAverage
+            stockPrice: stockPriceAverage
         };
-        console.log(stockProceAverage);
+        console.log('stockPriceAverage', stockPriceAverage);
 
-        if (stockProceAverage) {
+        if (stockPriceAverage) {
             stockPriceArray = [];
             dbService.addToDb(db, companyName.toLowerCase(), priceData, (result) => { })
         }
