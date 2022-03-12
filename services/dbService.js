@@ -1,7 +1,7 @@
-const MongoClient         = require('mongodb').MongoClient;
+const MongoClient  = require('mongodb').MongoClient;
 const calculations = require('../functions/helpers/calculations');
-const url                 = process.env.MONGO_URL;
-const Client              = new MongoClient(url, {useNewUrlParser: true, useUnifiedTopology: true});
+const url          = process.env.MONGO_URL;
+const Client       = new MongoClient(url, {useNewUrlParser: true, useUnifiedTopology: true});
 
 /**
  * Creates db connection. Throws error if connection fails.
